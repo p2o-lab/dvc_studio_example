@@ -29,5 +29,5 @@ stages:
       - training/model/trained_model.joblib
       - cache/data_preprocessed_test.pkl
     metrics:
-      - report/report/report.json:
+      - metrics.json:
           cache: false

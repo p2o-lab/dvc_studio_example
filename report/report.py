@@ -25,6 +25,12 @@ def create_model_report():
     with open('report/report/report.json', 'w') as f:
         f.write(json.dumps(report, indent=4))
 
+    metrics = {'weighted_f1_test': report['weighted avg']['f1-score'],
+               'accuracy_test': report['accuracy']}
+
+    with open('metrics.json', 'w') as f:
+        f.write(json.dumps(metrics, indent=4))
+
     cm = confusion_matrix(y_true, y_pred, labels=[0, 1])
     print('Confusion matrix:')
     print(cm)
