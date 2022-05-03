@@ -1,0 +1,33 @@
+stages:
+  read_data:
+    cmd: python data_processing/read_data.py
+    deps:
+    - data/raw_data.csv
+    outs:
+    - cache/data_train.pkl
+    - cache/data_test.pkl
+  preprocess_data:
+    cmd: python data_processing/preprocess_data.py
+    deps:
+      - cache/data_train.pkl
+      - cache/data_test.pkl
+    outs:
+      - cache/data_preprocessed_train.pkl
+      - cache/data_preprocessed_test.pkl
+  train_model:
+    cmd: python training/model_training.py
+    params:
+      -   model.c-value
+    deps:
+      - cache/data_preprocessed_train.pkl
+      - cache/data_preprocessed_test.pkl
+    outs:
+      - training/model/trained_model.joblib
+  compose_report:
+    cmd: python report/report.py
+    deps:
+      - training/model/trained_model.joblib
+      - cache/data_preprocessed_test.pkl
+    metrics:
+      - report/report/report.json:
+          cache: false
