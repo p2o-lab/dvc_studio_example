@@ -37,7 +37,7 @@ def create_model_report():
 
     plot_confusion_matrix(model, x_test, y_true)
     plt.tight_layout()
-    img_path = 'report/confusion_matrix.png'
+    img_path = 'report/report/confusion_matrix.png'
     plt.savefig(img_path, dpi=120)
 
 
