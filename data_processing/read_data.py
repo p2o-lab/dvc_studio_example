@@ -1,4 +1,5 @@
 import pandas as pd
+import yaml
 
 
 def import_data():
@@ -10,7 +11,10 @@ def import_data():
     print('DATA SPLIT')
     dataset_length = len(df)
 
-    train_dataset_length = int(dataset_length * 0.8)
+    with open('params.yaml', 'r') as stream:
+        params = yaml.safe_load(stream)
+    train_dataset_length = int(dataset_length * params['data']['split_value'])
+    print(f"Split value = {params['data']['split_value']}")
 
     df_train = df.iloc[:train_dataset_length, :]
     df_test = df.iloc[train_dataset_length + 1:, :]

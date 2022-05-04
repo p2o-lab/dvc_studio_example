@@ -2,13 +2,18 @@ stages:
   read_data:
     cmd: python data_processing/read_data.py
     deps:
+    - data_processing/read_data.py
     - data/raw_data.csv
+    - params.yaml
     outs:
     - cache/data_train.pkl
     - cache/data_test.pkl
+    params:
+      - data.split_value
   preprocess_data:
     cmd: python data_processing/preprocess_data.py
     deps:
+      - data_processing/preprocess_data.py
       - cache/data_train.pkl
       - cache/data_test.pkl
     outs:
@@ -19,6 +24,7 @@ stages:
     params:
       -   model.c-value
     deps:
+      - training/model_training.py
       - cache/data_preprocessed_train.pkl
       - cache/data_preprocessed_test.pkl
     outs:
@@ -26,6 +32,7 @@ stages:
   compose_report:
     cmd: python report/report.py
     deps:
+      - report/report.py
       - training/model/trained_model.joblib
       - cache/data_preprocessed_test.pkl
     metrics:
