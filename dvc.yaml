@@ -1,8 +1,12 @@
 stages:
+  download_data:
+    cmd: python data_import/download_data.py
+    outs:
+      - data/raw_data.tab
   read_data:
     cmd: python data_processing/read_data.py
     deps:
-    - data/raw_data.csv
+    - data/raw_data.tab
     outs:
     - cache/data_train.pkl
     - cache/data_test.pkl
@@ -19,6 +23,7 @@ stages:
     params:
       -   model.c-value
     deps:
+      - params.yaml
       - cache/data_preprocessed_train.pkl
       - cache/data_preprocessed_test.pkl
     outs:
