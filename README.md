@@ -1,13 +1,11 @@
 # DVC ML Ops Example
 This repository contains guidelines and recommendations how to use DVC from iterative.ai for MLOps.
 
+The major goal of implementation of MLOPs tools is to make experimenting with models reliable and traceable. More precisely, it means that for each resulted model information on every step, e.g. data import, feature selection, model training, are documented and can be restored at any time. Moreover, pre-defined metrics are calculated automatically and compared to ones of the previous model state. The overview table with paramters and calculated metrics is then generated automatically.
+
 ## Workflows
 
 ## Initialisation and setting up
-The major goal of implementation of MLOPs tools is to make experimenting with models reliable and traceable. More precisely, it means that for each resulted model information on every step, e.g. data import, feature selection, model training, are documented and can be restored at any time. Moreover, pre-defined metrics are calculated automatically and compared to ones of the previous model state. The overview table with paramters and calculated metrics is then generated automatically.
-
-To make it effective follow the guidelines:
-
 (1) Each step of the pipeline should be a separate python script (not jupyter notebook), e.g. data import, data cleaning, data preprocessing, data split, model training etc.
 The resulted project structure might look as follows.
 
