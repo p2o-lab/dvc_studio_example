@@ -133,8 +133,6 @@ The main benefit of using dvc repro is, if there are no changes in the previous 
 
 More information and further features are here: https://dvc.org/doc/command-reference/
 
-
-
 ### ML experimenting
 It is crucial to understand at every point of time for every model, which dataset, preprocessing steps, model parameters were used to get this very model.
 That means that so-called ml experiments are to track and resulted models are to associate with certain parameters set.
@@ -153,6 +151,12 @@ dvc repro
 Now you are able to compare models between different commits via comparison of metrics.json and report.md files. You can also use DVC Studio for these purposes.
 
 DVC also provides another way to running experiments. More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
+
+
+### Overview of experiments
+To get an overview of experiments' results, DVCStudio can be used: https://studio.iterative.ai/
+
+This tool provides a GUI connected to a git repository where parameters, metrics of different commits and branches can be tracked. More information can be found here: https://dvc.org/doc/studio
 
 
 ### Continuous machine learning
