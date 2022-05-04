@@ -1,8 +1,8 @@
 model:
-  c-value: 0.5
+  c-value: 0.8
 training:
   no_epochs: 128
   optimizer: adam
   lr: 0.001
 data:
-  split_value: 0.5
+  split_value: 0.8
