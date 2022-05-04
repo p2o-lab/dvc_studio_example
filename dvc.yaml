@@ -26,7 +26,6 @@ stages:
     deps:
       - training/model_training.py
       - cache/data_preprocessed_train.pkl
-      - cache/data_preprocessed_test.pkl
     outs:
       - training/model/trained_model.joblib
   compose_report:
