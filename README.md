@@ -121,27 +121,6 @@ dvc metrics diff
 ```
 More information and further features are here: https://dvc.org/doc/command-reference/
 
-### Experimenting
-(1) To run different experiements first spicify parameters you would like to vary. The default file for parameters is params.yaml
-Example of parameter file:
-```
-train:
-  optimizer: adam
-  batch_size: 125
-model:
-  no_neurons: 20
-  no_layers: 3
-```
-
-(2) Integrate the parameters from this file into your code, for example as follows:
-```
-    with open('params.yaml', 'r') as stream:
-        params = yaml.safe_load(stream)
-    batch_size = params['training']['batch_size']
-```
-
-(3) More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
-
 ### Continuous machine learning
 In order to automate single steps of the pipeline the framework CML from iterative.ai is recommended to use: https://github.com/iterative/cml
 This tool allows defining pipelines that will be run by means of Github Actions automatically after any change is pushed on the repository.
@@ -186,14 +165,27 @@ More information is here https://docs.github.com/en/actions/hosting-your-own-run
 ### ML experimenting
 It is crucial to understand at every point of time for every model, which dataset, preprocessing steps, model parameters were used to get this very model.
 That means that so-called ml experiments are to track and resulted models are to associate with certain parameters set.
-For this purpose an experiments' framework must be used. Please read on how to use it here https://dvc.org/doc/start/experiments
-Please follow a rule that every experiment must have its commit.
-Then each commit would mean a single experiment point that might be compared to any other.
-And more important you can check out any commit and return to that experiment state.
-To be able to graphically compare experiments, you can also use DVC Studio https://studio.iterative.ai/
+(1) To run different experiements first spicify parameters you would like to vary. The default file for parameters is params.yaml
+Example of parameter file:
+```
+train:
+  optimizer: adam
+  batch_size: 125
+model:
+  no_neurons: 20
+  no_layers: 3
+```
 
-### Hyperparameter optimisation
-Hyperparameter optimisation is recommended to consider as a separate branch to find hyperparameters.
+(2) Integrate the parameters from this file into your code, for example as follows:
+```
+    with open('params.yaml', 'r') as stream:
+        params = yaml.safe_load(stream)
+    batch_size = params['training']['batch_size']
+```
+
+(3) More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
+
+Note 1: It is recommended that every model architecture has its own git branch where results and code are saved. For small changes, commits can be used. For example if you are training a classifier, a classifier based on SVM must be in a separate branch, while different c-values might be stored as commits.
 
 ## Common workflows
 
@@ -202,7 +194,7 @@ Hyperparameter optimisation is recommended to consider as a separate branch to f
 (2) Upload the dataset onto the ML workstation according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts or 
 (3) Prepare the dataset locally according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts
 
-### Initialisation
+### Setting up the repository
 Pre-requestives: Dataset is on Dataverse or locally stored
 
 (1) Create a git respository for the problem, e.g. on Github
@@ -210,28 +202,23 @@ Pre-requestives: Dataset is on Dataverse or locally stored
 (2) Create at least two braches: main and develop. Use main only for a model that is designed to be in production or deployed.
 Development branch is for a model that you currently work on.
 
-(3) On your local machine initialise dvc by means of running this command in the terminal or command line
+(3) Write your code.
+
+(4) On your local machine initialise dvc by means of running this command in the terminal or command line
 ```
 dvc init
 ```
 
-(4) Add dvc remote: https://dvc.org/doc/command-reference/remote/add
-The easiest way is to add a local remote:
-```
-dvc remote add -d my_project /tmp/dvcstore
-```
-By execution of this command, there will created a folder where dvc data will be stored. Now you can start building your baseline model.
+(5) Specify the data pipeline in dvc.yaml file.
 
-Please take into account that the usage of a local remote does not support data transfer between computers. Only online remotes support this function. That is why for small datasets it is recommended to use online storages, e.g. google cloud, s3 or similar that are avaible for free with capacity limitations.
+(6) Specify parameters in params.yaml.
 
-(5)  After you created a baseline model in development branch, it is time to add temporary files to dvc remote. For that you command
+(7) Test your pipeline if everything works as intended and without error:
 ```
-dvc add folder_or_file_name
+dvc repro
 ```
-You need to run this command everytime additional intermediate files or model are to add. If those files are only changed, no run is neccesary.
-More information on arguments on that is here: https://dvc.org/doc/command-reference/add
 
-(6) Before commiting your changes, consider carefully which files must be added to gitignore. Usually it must be your folder with intermediate results and dvc cache folder. You do not want to store your initial data, intermediate results, cache and models on github. Therefore, add them to gitignore.
+(8) Before commiting your changes, consider carefully which files must be added to gitignore. Usually it must be your folder with intermediate results and dvc cache folder. You do not want to store your initial data, intermediate results, cache and models on github. Therefore, add them to gitignore.
 
 ### ML experimenting
 (1) If you want to try something completely different (e.g. another model architecture), it is recommended to create a new branch. For alteration of model parameters or usage of new preprocessing steps or extended dataset, a new commit would be enough. But you can also create a new branch even for parameter changes.
