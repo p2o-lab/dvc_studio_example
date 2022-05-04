@@ -159,25 +159,12 @@ To get an overview of experiments' results, DVCStudio can be used: https://studi
 This tool provides a GUI connected to a git repository where parameters, metrics of different commits and branches can be tracked. More information can be found here: https://dvc.org/doc/studio
 
 
-### Dataset upload
-(1) Upload the dataset on the Dataset repository according to the guidelines above or
-(2) Upload the dataset onto the ML workstation according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts or 
-(3) Prepare the dataset locally according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts
-
-
-### Self-hosted runner
-In case a large dataset or when training performance of the essence it is recommended to use self-hosted runner.
-The runner might be deployed on your local computer or on the ML workstation of the Process-to-Order Lab.
-For the second option please contact vkhaydarov.
-More information is here https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
-
-
 ### Model deployment
 The main git branch might be thought as a model deployed in production or, in other words, a tested and validated model, which performs the best.
 Usually, after ML experimenting you select such a model from your working versions and via a pull request merge it to the main branch. To do this please use Pull request functionality of GitHub. Here, by means of direct comparison of metrics.json and report.md files you can decide whether it is worth it to replace the model.
 
+
 ### Continous machine learning (optional)
-### Continuous machine learning
 In order to automate single steps of the pipeline the framework CML from iterative.ai is recommended to use: https://github.com/iterative/cml
 This tool allows defining pipelines that will be run by means of Github Actions automatically after any change is pushed on the repository.
 
@@ -215,3 +202,10 @@ An example can be found here: https://github.com/vkhaydarov/mlops_training
 Note 1: If you want to use CML then you need to create another file that contains cml pipeline. 
 Note 2: If using GitHub, then create the cml pipeline and place it in './.github/workflows/cml.yml'
 Note 3: If you are using a dataset stored locally (e.g. large image dataset), please skip this.
+
+
+### Self-hosted runner for CML
+In case a large dataset or when training performance of the essence it is recommended to use self-hosted runner.
+The runner might be deployed on your local computer or on the ML workstation of the Process-to-Order Lab.
+For the second option please contact vkhaydarov.
+More information is here https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
