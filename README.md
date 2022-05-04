@@ -41,9 +41,7 @@ df = pd.read_pickle(import_path)
 ```
 The imported data will be then present in the variable named 'df'.
 
-(3) Create a dvc pipeline that runs a set of pre-defined steps.
-
-First, dvc must be installed and initialised on the computer. The easiest way to install it is just to run:
+(3) First, dvc must be installed and initialised on the computer. The easiest way to install it is just to run:
 ```
 pip install dvc
 ``` 
@@ -53,7 +51,8 @@ To initialise dvc you need to run
 ```
 dvc init
 ```
-Then create a yaml-file named 'dvc.yaml' in the root of the code. In this file a pipeline must be defined. Here is an example:
+
+(4) Create a DVC pipeline in a yaml-file named 'dvc.yaml' in the root of the code. Here is an example:
 ```
 stages:
   get_data:
@@ -100,59 +99,8 @@ stages:
 
 Note 1: Python scripts must be also be listed as dependencies.
 
-To re-run the pipeline locally after any changes in the code execute the following:
-```
-dvc repro
-```
-In case you want DVC to rerun all stages even if there are no changes, use:
-```
-dvc repro -f
-```
 
-The main benefit of using dvc repro is, if there are no changes in the previous steps, then the input data for the next one will be taken from cache (intermediate results). Thus, experimenting will be in general faster.
-
-To output metrics and compare them with metrics' values from another commit locally, use
-```
-dvc metrics show
-```
-and
-```
-dvc metrics diff
-```
-More information and further features are here: https://dvc.org/doc/command-reference/
-
-### ML experimenting
-(1) If you want to try something completely different (e.g. another model architecture), it is recommended to create a new branch. For alteration of model parameters or usage of new preprocessing steps or extended dataset, a new commit would be enough. But you can also create a new branch even for parameter changes.
-
-(2) After changes you need to add new intermediate files to dvc tracker by means of:
-```
-dvc add folder_or_file_name
-```
-
-(3) If dvc pipeline requires to be updated, update the file dvc.yaml correspondingly.
-
-(4) Run dvc pipeline:
-```
-dvc repro
-```
-
-(5) To push intermediate files onto remote, run:
-```
-dvc push
-```
-This command will copy your selected files onto dvc remote and from now on you are able to track changes and pull associated versions of files in other commits or even from another computer. However, this computer must have an access to the dvc repository.
-Please run this command every time you have a self-containing state, e.g. after a new model is trained and now you want to try another architecture in another branch.
-
-(6) Commit your changes via git. By doing this, git information on linked dvc repository and remotes will be also updated.
-
-Now you are able to compare models between different commits via comparison of metrics.json and report.md files. You can also use DVC Studio for these purposes.
-
-
-### Something
-
-It is crucial to understand at every point of time for every model, which dataset, preprocessing steps, model parameters were used to get this very model.
-That means that so-called ml experiments are to track and resulted models are to associate with certain parameters set.
-(1) To run different experiements first spicify parameters you would like to vary. The default file for parameters is params.yaml
+(5) To able to run different experiements first specify parameters must be specified. The default file for parameters is params.yaml
 Example of parameter file:
 ```
 train:
@@ -163,16 +111,49 @@ model:
   no_layers: 3
 ```
 
-(2) Integrate the parameters from this file into your code, for example as follows:
+(6) Integrate the parameters from this file into your code, for example as follows:
 ```
     with open('params.yaml', 'r') as stream:
         params = yaml.safe_load(stream)
     batch_size = params['training']['batch_size']
 ```
 
-(3) More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
+(7) Check your pipeline by running the command:
+```
+dvc repro
+```
+In case you want DVC to rerun all stages even if there are no changes, use:
+```
+dvc repro -f
+```
+
+The main benefit of using dvc repro is, if there are no changes in the previous steps, then the input data for the next one will be taken from cache (intermediate results). Thus, experimenting will be in general faster.
+
+(8) Now you can commit the initial model. Before doing this, consider carefully which files must be added to gitignore. Usually it must be your folder with intermediate results and dvc cache folder. You do not want to store your initial data, intermediate results, cache and models on github. Therefore, add them to gitignore.
+
+More information and further features are here: https://dvc.org/doc/command-reference/
+
+
+
+### ML experimenting
+It is crucial to understand at every point of time for every model, which dataset, preprocessing steps, model parameters were used to get this very model.
+That means that so-called ml experiments are to track and resulted models are to associate with certain parameters set.
 
 Note 1: It is recommended that every model architecture has its own git branch where results and code are saved. For small changes, commits can be used. For example if you are training a classifier, a classifier based on SVM must be in a separate branch, while different c-values might be stored as commits.
+
+(1) Change parameters via changing its value in the file params.yaml
+
+(2) Run dvc pipeline:
+```
+dvc repro
+```
+
+(3) Commit your changes via git.
+
+Now you are able to compare models between different commits via comparison of metrics.json and report.md files. You can also use DVC Studio for these purposes.
+
+DVC also provides another way to running experiments. More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
+
 
 ### Continuous machine learning
 In order to automate single steps of the pipeline the framework CML from iterative.ai is recommended to use: https://github.com/iterative/cml
@@ -221,58 +202,6 @@ The runner might be deployed on your local computer or on the ML workstation of 
 For the second option please contact vkhaydarov.
 More information is here https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
 
-
-### Setting up the repository
-Pre-requestives: Dataset is on Dataverse or locally stored
-
-(1) Create a git respository for the problem, e.g. on Github
-
-(2) Create at least two braches: main and develop. Use main only for a model that is designed to be in production or deployed.
-Development branch is for a model that you currently work on.
-
-(3) Write your code.
-
-(4) On your local machine initialise dvc by means of running this command in the terminal or command line
-```
-dvc init
-```
-
-(5) Specify the data pipeline in dvc.yaml file.
-
-(6) Specify parameters in params.yaml.
-
-(7) Test your pipeline if everything works as intended and without error:
-```
-dvc repro
-```
-
-(8) Before commiting your changes, consider carefully which files must be added to gitignore. Usually it must be your folder with intermediate results and dvc cache folder. You do not want to store your initial data, intermediate results, cache and models on github. Therefore, add them to gitignore.
-
-### ML experimenting
-(1) If you want to try something completely different (e.g. another model architecture), it is recommended to create a new branch. For alteration of model parameters or usage of new preprocessing steps or extended dataset, a new commit would be enough. But you can also create a new branch even for parameter changes.
-
-(2) After changes you need to add new intermediate files to dvc tracker by means of:
-```
-dvc add folder_or_file_name
-```
-
-(3) If dvc pipeline requires to be updated, update the file dvc.yaml correspondingly.
-
-(4) Run dvc pipeline:
-```
-dvc repro
-```
-
-(5) To push intermediate files onto remote, run:
-```
-dvc push
-```
-This command will copy your selected files onto dvc remote and from now on you are able to track changes and pull associated versions of files in other commits or even from another computer. However, this computer must have an access to the dvc repository.
-Please run this command every time you have a self-containing state, e.g. after a new model is trained and now you want to try another architecture in another branch.
-
-(6) Commit your changes via git. By doing this, git information on linked dvc repository and remotes will be also updated.
-
-Now you are able to compare models between different commits via comparison of metrics.json and report.md files. You can also use DVC Studio for these purposes.
 
 ### Model deployment
 The main git branch might be thought as a model deployed in production or, in other words, a tested and validated model, which performs the best.
