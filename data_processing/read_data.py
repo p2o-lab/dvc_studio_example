@@ -4,7 +4,7 @@ import pandas as pd
 def import_data():
     data_file = 'data/raw_data.tab'
     print('Reading data from %s' % data_file)
-    df = pd.read_csv(data_file, sep='\t')#, lineterminator='\n')
+    df = pd.read_csv(data_file, sep='\t')
     print(df.head())
 
     print('DATA SPLIT')
