@@ -1,7 +1,9 @@
 # DVC ML Ops Example
 This repository contains guidelines and recommendations how to use DVC from iterative.ai for MLOps.
 
-## MLOps
+## Workflows
+
+## Initialisation and setting up
 The major goal of implementation of MLOPs tools is to make experimenting with models reliable and traceable. More precisely, it means that for each resulted model information on every step, e.g. data import, feature selection, model training, are documented and can be restored at any time. Moreover, pre-defined metrics are calculated automatically and compared to ones of the previous model state. The overview table with paramters and calculated metrics is then generated automatically.
 
 To make it effective follow the guidelines:
@@ -121,6 +123,59 @@ dvc metrics diff
 ```
 More information and further features are here: https://dvc.org/doc/command-reference/
 
+### ML experimenting
+(1) If you want to try something completely different (e.g. another model architecture), it is recommended to create a new branch. For alteration of model parameters or usage of new preprocessing steps or extended dataset, a new commit would be enough. But you can also create a new branch even for parameter changes.
+
+(2) After changes you need to add new intermediate files to dvc tracker by means of:
+```
+dvc add folder_or_file_name
+```
+
+(3) If dvc pipeline requires to be updated, update the file dvc.yaml correspondingly.
+
+(4) Run dvc pipeline:
+```
+dvc repro
+```
+
+(5) To push intermediate files onto remote, run:
+```
+dvc push
+```
+This command will copy your selected files onto dvc remote and from now on you are able to track changes and pull associated versions of files in other commits or even from another computer. However, this computer must have an access to the dvc repository.
+Please run this command every time you have a self-containing state, e.g. after a new model is trained and now you want to try another architecture in another branch.
+
+(6) Commit your changes via git. By doing this, git information on linked dvc repository and remotes will be also updated.
+
+Now you are able to compare models between different commits via comparison of metrics.json and report.md files. You can also use DVC Studio for these purposes.
+
+
+### Something
+
+It is crucial to understand at every point of time for every model, which dataset, preprocessing steps, model parameters were used to get this very model.
+That means that so-called ml experiments are to track and resulted models are to associate with certain parameters set.
+(1) To run different experiements first spicify parameters you would like to vary. The default file for parameters is params.yaml
+Example of parameter file:
+```
+train:
+  optimizer: adam
+  batch_size: 125
+model:
+  no_neurons: 20
+  no_layers: 3
+```
+
+(2) Integrate the parameters from this file into your code, for example as follows:
+```
+    with open('params.yaml', 'r') as stream:
+        params = yaml.safe_load(stream)
+    batch_size = params['training']['batch_size']
+```
+
+(3) More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
+
+Note 1: It is recommended that every model architecture has its own git branch where results and code are saved. For small changes, commits can be used. For example if you are training a classifier, a classifier based on SVM must be in a separate branch, while different c-values might be stored as commits.
+
 ### Continuous machine learning
 In order to automate single steps of the pipeline the framework CML from iterative.ai is recommended to use: https://github.com/iterative/cml
 This tool allows defining pipelines that will be run by means of Github Actions automatically after any change is pushed on the repository.
@@ -156,43 +211,18 @@ You can get additional information on the run by selecting it on the tab "Action
 
 An example can be found here: https://github.com/vkhaydarov/mlops_training
 
+### Dataset upload
+(1) Upload the dataset on the Dataset repository according to the guidelines above or
+(2) Upload the dataset onto the ML workstation according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts or 
+(3) Prepare the dataset locally according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts
+
+
 ### Self-hosted runner
 In case a large dataset or when training performance of the essence it is recommended to use self-hosted runner.
 The runner might be deployed on your local computer or on the ML workstation of the Process-to-Order Lab.
 For the second option please contact vkhaydarov.
 More information is here https://docs.github.com/en/actions/hosting-your-own-runners/about-self-hosted-runners
 
-### ML experimenting
-It is crucial to understand at every point of time for every model, which dataset, preprocessing steps, model parameters were used to get this very model.
-That means that so-called ml experiments are to track and resulted models are to associate with certain parameters set.
-(1) To run different experiements first spicify parameters you would like to vary. The default file for parameters is params.yaml
-Example of parameter file:
-```
-train:
-  optimizer: adam
-  batch_size: 125
-model:
-  no_neurons: 20
-  no_layers: 3
-```
-
-(2) Integrate the parameters from this file into your code, for example as follows:
-```
-    with open('params.yaml', 'r') as stream:
-        params = yaml.safe_load(stream)
-    batch_size = params['training']['batch_size']
-```
-
-(3) More information on how to get overview of run experiments, design new experiment without changing the file, queue them and run in parallel can be found here: https://dvc.org/doc/start/experiments
-
-Note 1: It is recommended that every model architecture has its own git branch where results and code are saved. For small changes, commits can be used. For example if you are training a classifier, a classifier based on SVM must be in a separate branch, while different c-values might be stored as commits.
-
-## Common workflows
-
-### Dataset upload
-(1) Upload the dataset on the Dataset repository according to the guidelines above or
-(2) Upload the dataset onto the ML workstation according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts or 
-(3) Prepare the dataset locally according the following folder structure: 01_datasheet, 02_data, 03_raw_data and 04_data_cleaning_scripts
 
 ### Setting up the repository
 Pre-requestives: Dataset is on Dataverse or locally stored
@@ -245,14 +275,6 @@ Please run this command every time you have a self-containing state, e.g. after 
 (6) Commit your changes via git. By doing this, git information on linked dvc repository and remotes will be also updated.
 
 Now you are able to compare models between different commits via comparison of metrics.json and report.md files. You can also use DVC Studio for these purposes.
-
-### Get to a certain state of the model
-(1) If you want to return to a certain state of your model, then you need to select the corresponding git commit and check it out.
-(2) To pull data from dvc repository to this commit, run:
-```
-dvc pull
-```
-Now your full set of files corresponds that state.
 
 ### Model deployment
 The main git branch might be thought as a model deployed in production or, in other words, a tested and validated model, which performs the best.
