@@ -1,5 +1,5 @@
 model:
-  c-value: 0.8
+  c-value: 10
 training:
   no_epochs: 128
   optimizer: adam
